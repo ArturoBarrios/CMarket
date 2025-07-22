@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="bg-black">
     <NuxtRouteAnnouncer />
-    <div class="container">
+    <div class="container place-self-center ">
       <NuxtPage />
     </div>
   </div>
@@ -17,3 +17,16 @@ onMounted(() => {
   jokesStore.fetchJokes()
 })
 </script>
+
+<style>
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* For iOS Safari specifically */
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+</style>
