@@ -3,16 +3,21 @@ export const useThemeStore = defineStore('theme', () => {
     dark: {
       text: {
         primary: 'text-white',
-        secondary: 'text-gray-300',
+        secondary: 'text-black',
         accent: 'text-blue-400'
-      },
+      },      
       bg: {
         primary: 'bg-black',
         secondary: 'bg-gray-900',
         accent: 'bg-blue-500'
       },
-      border: 'border-gray-700',
-      hover: 'hover:bg-gray-800'
+      border: {
+        primary: 'border-gray-700',
+        secondary: 'border-gray-600',
+      },
+      hover: {
+          primary: 'hover:bg-gray-500'
+      }
     },
     light: {
       text: {
@@ -25,7 +30,10 @@ export const useThemeStore = defineStore('theme', () => {
         secondary: 'bg-gray-100',
         accent: 'bg-blue-500'
       },
-      border: 'border-gray-200',
+      border: {
+        primary: 'border-gray-200',
+        secondary: 'border-gray-300',
+      },
       hover: 'hover:bg-gray-100'
     }
   }

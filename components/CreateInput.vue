@@ -1,8 +1,9 @@
 <template>
-  <div class="border border-gray-200 rounded-xl p-4 bg-white shadow mb-6">
+  <div :class="[colors.border.primary, colors.bg.primary]" class="border border-gray-200 rounded-xl p-4  shadow mb-6">
     <textarea
       v-model="jokeText"
       placeholder="Write a joke..."
+      :class="[colors.text.primary]"
       class="w-full resize-none border-none outline-none text-lg placeholder-gray-500"
       rows="3"
       maxlength="280"
@@ -42,7 +43,8 @@
       <button
         @click="postJoke"
         :disabled="!canPost"
-        class="px-6 py-2 bg-blue-500 text-white rounded-full font-semibold cursor-pointer transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600"
+        :class="[colors.text.secondary]"
+        class="px-6 py-2 bg-blue-500 rounded-full font-semibold cursor-pointer transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600"
       >
         Post Joke
       </button>
@@ -52,6 +54,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+
+const { colors } = useThemeStore()
 
 const jokeText = ref('')
 

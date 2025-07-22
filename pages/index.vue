@@ -30,6 +30,8 @@ import CreateInput from '~/components/CreateInput.vue'
 import JokeCardV1 from '~/components/JokeCardV1.vue'
 import Nav from '~/components/Nav.vue'
 import { onMounted } from 'vue'
+const { colors } = useThemeStore()
+// :class="colors.text.primary"
 
 const jokesStore = useJokesStore()
 

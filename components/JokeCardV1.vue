@@ -1,6 +1,10 @@
 <template>
-  <div class="border border-gray-200 rounded-xl p-5 bg-white  shadow mb-4">
-    <div class="text-base mb-4 text-gray-800">{{ joke }}</div>
+  <div
+   :class="[colors.bg.primary]"
+   class="border border-gray-200 rounded-xl p-5 shadow mb-4">
+    <div 
+    :class="[colors.text.primary]"
+    class="text-base mb-4 text-gray-800">{{ joke }}</div>
     <div class="flex justify-between items-center">
       <span class="font-semibold text-teal-400">@{{ username }}</span>
       
@@ -43,6 +47,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useLikeJoke } from '~/composables/useLikeJoke'
+
+const { colors } = useThemeStore()
 
 const props = defineProps<{
   joke: string
