@@ -42,11 +42,11 @@
       </div>
       <button
         @click="postJoke"
-        :disabled="!canPost"
+        :disabled="!canPost || jokesStore.creating"
         :class="[colors.text.secondary]"
         class="px-6 py-2 bg-blue-500 rounded-full font-semibold cursor-pointer transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600"
       >
-        Post Joke
+        {{ jokesStore.creating ? 'Posting...' : 'Post Joke' }}
       </button>
     </div>
   </div>
@@ -54,8 +54,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useJokesStore } from '~/stores/jokes'
 
 const { colors } = useThemeStore()
+const jokesStore = useJokesStore()
 
 const jokeText = ref('')
 
@@ -69,13 +71,16 @@ const strokeDashoffset = computed(() => circumference * (1 - progress.value))
 const circleColor = computed(() => charactersLeft.value <= 50 ? '#ef4444' : '#22c55e')
 const textColor = computed(() => charactersLeft.value <= 50 ? 'text-red-500' : 'text-green-500')
 
-function postJoke() {
-  if (!canPost.value) return
+async function postJoke() {
+  if (!canPost.value || jokesStore.creating) return
   
-  // For now, just show an alert - later this will call your API
-  alert(`Posting joke: "${jokeText.value}"`)
-  
-  // Clear the input after posting
-  jokeText.value = ''
+  try {
+    await jokesStore.createJoke(jokeText.value.trim())
+    // Clear the input after successful posting
+    jokeText.value = ''
+  } catch (error) {
+    // Error is already handled in the store, could add toast notification here
+    console.error('Failed to post joke:', error)
+  }
 }
 </script>

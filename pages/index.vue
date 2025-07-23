@@ -8,16 +8,20 @@
       <CreateInput />
       
       <!-- Jokes Feed -->
-      <div v-if="jokesStore.loading" class="text-center py-8">Loading jokes...</div>
-      <div v-else-if="jokesStore.error" class="text-red-500 text-center py-8">{{ jokesStore.error }}</div>
+      <div v-if="loading" class="text-center py-8">Loading jokes...</div>
+      <div v-else-if="error" class="text-red-500 text-center py-8">{{ error }}</div>
       <div v-else class="space-y-4">
         <JokeCardV1
-          v-for="joke in jokesStore.jokes"
+          v-for="joke in jokes"
           :key="joke.id"
           :joke="joke.content"
-          :username="joke.user.username"
+          :username="joke.user ? joke.user.username : joke.username"
           :likes="joke.likes || 0"
+          :dislikes="joke.dislikes || 0"
+          :retweets="joke.retweets || 0"
           :jokeId="joke.id"
+          :userLiked="joke.userLiked"
+          :userRetweeted="joke.userRetweeted"
         />
       </div>
     </div>
@@ -30,14 +34,15 @@ import CreateInput from '~/components/CreateInput.vue'
 import JokeCardV1 from '~/components/JokeCardV1.vue'
 import Nav from '~/components/Nav.vue'
 import { onMounted } from 'vue'
-const { colors } = useThemeStore()
-// :class="colors.text.primary"
+import { storeToRefs } from 'pinia'
 
 const jokesStore = useJokesStore()
+const { jokes, loading, error } = storeToRefs(jokesStore)
 
 onMounted(() => {
   if (!jokesStore.jokes.length) {
     jokesStore.fetchJokes()
   }
+  console.log("Jokes fetched:", jokesStore.jokes)
 })
 </script>

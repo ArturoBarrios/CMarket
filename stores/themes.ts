@@ -16,7 +16,8 @@ export const useThemeStore = defineStore('theme', () => {
         secondary: 'border-gray-600',
       },
       hover: {
-          primary: 'hover:bg-gray-500'
+        primary: 'hover:bg-gray-800',
+        secondary: 'hover:bg-blue-600'
       }
     },
     light: {
@@ -34,7 +35,10 @@ export const useThemeStore = defineStore('theme', () => {
         primary: 'border-gray-200',
         secondary: 'border-gray-300',
       },
-      hover: 'hover:bg-gray-100'
+       hover: {
+        primary: 'hover:bg-gray-800',
+        secondary: 'hover:bg-blue-600'
+      }
     }
   }
 

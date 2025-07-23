@@ -1,22 +1,22 @@
 import { useRuntimeConfig } from 'nuxt/app'
 
-export function useLikeJoke() {
-  const toggleLike = async (jokeId: string, userId: string, liked: boolean) => {
+export function useRetweetJoke() {
+  const toggleRetweet = async (jokeId: string, userId: string, retweeted: boolean) => {
     const config = useRuntimeConfig()
     const apiBase = config.public.capi
-    const res = await fetch(`${apiBase}/primary/like-objects`, {
+    const res = await fetch(`${apiBase}/primary/retweet-objects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         jokeId,
         userId,
-        liked,
+        retweeted,
       }),
     })
-    if (!res.ok) throw new Error('Failed to update joke like')
+    if (!res.ok) throw new Error('Failed to Retweet')
     const result = await res.json()
     return result
   }
 
-  return { toggleLike }
+  return { toggleRetweet }
 }

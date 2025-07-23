@@ -44,31 +44,62 @@
   </nav>
   
   <!-- Mobile Bottom Navigation (below md) -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+  <nav 
+  :class="colors.bg.primary"
+  class="md:hidden fixed bottom-0 left-0 right-0 border-t border-gray-200 px-4 py-2">
     <div class="flex justify-around items-center">
       <a href="#" class="flex flex-col items-center space-y-1 p-2">
-        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-          <span class="text-white font-bold text-sm">C</span>
+        <div 
+        :class="colors.bg.primary"
+        class="w-6 h-6 rounded-full flex items-center justify-center">
+          <span 
+          :class="colors.text.primary"
+          class="font-bold text-sm">C</span>
         </div>
-        <span class="text-xs">Home</span>
+        <span 
+        :class="colors.text.primary"
+        class="text-xs">Home</span>
       </a>
       
-      <a href="#" class="flex flex-col items-center space-y-1 p-2">
-        <div class="w-6 h-6">
+      <a href="#" 
+      class="flex flex-col items-center space-y-1 p-2">
+        <div 
+        :class="colors.text.primary"
+        class="w-6 h-6">
           <svg fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
         </div>
-        <span class="text-xs">Explore</span>
+        <span 
+        :class="colors.text.primary"
+        class="text-xs">Explore</span>
+      </a>
+
+      <a href="#" 
+      class="flex flex-col items-center space-y-1 p-2">
+        <div 
+        :class="colors.text.primary"
+        class="w-6 h-6">
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <span 
+        :class="colors.text.primary"
+        class="text-xs">Competitions</span>
       </a>
       
       <a href="#" class="flex flex-col items-center space-y-1 p-2">
-        <div class="w-6 h-6">
+        <div 
+        :class="colors.text.primary"
+        class="w-6 h-6">
           <svg fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
           </svg>
         </div>
-        <span class="text-xs">Profile</span>
+        <span 
+        :class="colors.text.primary"
+        class="text-xs">Profile</span>
       </a>
     </div>
     
