@@ -1,6 +1,13 @@
 <template>
   <div :class="colors.bg.primary" class="min-h-screen flex items-center justify-center p-4">
-    <div :class="[colors.bg.secondary, colors.border.primary]" class="w-full max-w-md border rounded-xl p-8 shadow-lg">
+    <div :class="[colors.bg.secondary, colors.border.primary]" class="w-full max-w-md border rounded-xl p-8 shadow-lg relative">
+      <button
+        @click="navigateTo('/')"
+        class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition text-white hover:bg-white hover:bg-opacity-20 cursor-pointer"
+      >
+        🏠
+      </button>
+      
       <h1 :class="colors.text.primary" class="text-3xl font-bold text-center mb-8">
         Sign Up
       </h1>

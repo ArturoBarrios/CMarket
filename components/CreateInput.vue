@@ -37,7 +37,7 @@
           </svg>
         </div>
         <div class="text-xs mt-1" :class="textColor">
-          {{ charactersLeft }} left
+          {{ charactersLeft }} characters left
         </div>
       </div>
       <button
@@ -55,23 +55,34 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useJokesStore } from '~/stores/jokes'
+import { useAuthStore } from '~/stores/auth'
+import { storeToRefs } from 'pinia'
 
 const { colors } = useThemeStore()
 const jokesStore = useJokesStore()
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
 
 const jokeText = ref('')
+const limit = 100;
 
-const charactersLeft = computed(() => 280 - jokeText.value.length)
-const canPost = computed(() => jokeText.value.trim().length > 0 && jokeText.value.length <= 280)
+const charactersLeft = computed(() => limit - jokeText.value.length)
+const canPost = computed(() => jokeText.value.trim().length > 0 && jokeText.value.length <= limit)
 
 // Circle progress calculations
 const circumference = 2 * Math.PI * 14 // radius = 14
-const progress = computed(() => jokeText.value.length / 280)
+const progress = computed(() => jokeText.value.length / limit)
 const strokeDashoffset = computed(() => circumference * (1 - progress.value))
 const circleColor = computed(() => charactersLeft.value <= 50 ? '#ef4444' : '#22c55e')
 const textColor = computed(() => charactersLeft.value <= 50 ? 'text-red-500' : 'text-green-500')
 
 async function postJoke() {
+  // Check authentication first
+  if (!isAuthenticated.value) {
+    await navigateTo('/signup')
+    return
+  }
+  
   if (!canPost.value || jokesStore.creating) return
   
   try {

@@ -35,12 +35,21 @@
         </div>
         <span class="text-xl text-white">Explore</span>
       </a>
+
+      <!-- Signout (when authenticated) -->
+      <button v-if="isAuthenticated" 
+      @click="handleSignout"
+      :class="colors.hover.primary"
+      class="flex items-center space-x-3 p-3 rounded-xl transition cursor-pointer">
+        <div :class="colors.text.primary" class="w-6 h-6">
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <span :class="colors.text.primary" class="text-xl">Sign Out</span>
+      </button>
     </div>
-    
-    <!-- Competition Section -->
-    <div class="mt-6">
-      <Competition />
-    </div>
+
   </nav>
   
   <!-- Mobile Bottom Navigation (below md) -->
@@ -101,17 +110,36 @@
         :class="colors.text.primary"
         class="text-xs">Profile</span>
       </a>
-    </div>
-    
-    <!-- Mobile Competition Section -->
-    <div class="mt-3 mb-2">
-      <Competition />
+
+      <!-- Signout (when authenticated) -->
+      <button v-if="isAuthenticated" 
+      @click="handleSignout"
+      class="flex flex-col items-center space-y-1 p-2 cursor-pointer">
+        <div 
+        :class="colors.text.primary"
+        class="w-6 h-6">
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <span 
+        :class="colors.text.primary"
+        class="text-xs">Sign Out</span>
+      </button>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import Competition from './Competition.vue'
-const { colors } = useThemeStore()
+import { useAuthStore } from '~/stores/auth'
 
+const { colors } = useThemeStore()
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
+
+const handleSignout = async () => {
+  authStore.logout()
+  await navigateTo('/')
+}
 </script>

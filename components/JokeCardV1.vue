@@ -2,11 +2,15 @@
   <div
    :class="[colors.bg.primary]"
    class="border border-gray-200 rounded-xl p-5 shadow mb-4">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="font-semibold text-teal-400">@{{ username }}</span>
+      <span v-if="timeAgo" class="text-sm text-gray-500">- {{ timeAgo }}</span>
+    </div>
     <div 
     :class="[colors.text.primary]"
     class="text-base mb-4 text-gray-800">{{ joke }}</div>
     <div class="flex justify-between items-center">
-      <span class="font-semibold text-teal-400">@{{ username }}</span>
+      <span class="opacity-0"></span>
       
       <div class="flex items-center gap-4">
         <span class="flex items-center gap-1 text-yellow-500 font-medium">
@@ -47,6 +51,7 @@ const props = defineProps<{
   jokeId: string
   userLiked?: boolean
   userRetweeted?: boolean
+  timeAgo?: string
 }>()
 
 

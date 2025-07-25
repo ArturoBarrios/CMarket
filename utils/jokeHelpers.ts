@@ -37,7 +37,8 @@ export function processJokeWithStats(joke: any, userId: string) {
     retweets,
     dislikes,
     userLiked,
-    userRetweeted
+    userRetweeted,
+    timeAgo: getTimeAgo(joke.createdAt)
   }
 }
 
@@ -64,4 +65,33 @@ export function getUserLikeStatus(likeObjects: Array<{ userId: string, liked: bo
     userLikeExists: !!userLike,
     currentLikeValue: userLike?.liked
   }
+}
+
+export function getTimeAgo(createdAt: string | Date): string {
+  const now = new Date()
+  const created = new Date(createdAt)
+  const diffInMs = now.getTime() - created.getTime()
+  const diffInSeconds = Math.floor(diffInMs / 1000)
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds}s`
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}m`
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return `${diffInHours}h`
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 365) {
+    return `${diffInDays}d`
+  }
+
+  const diffInYears = Math.floor(diffInDays / 365)
+  return `${diffInYears}y`
 }

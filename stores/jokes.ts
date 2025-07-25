@@ -16,6 +16,13 @@ export const useJokesStore = defineStore('jokes', {
       this.loading = true
       this.error = null
       try {
+        // Get current user ID from auth store
+        const authStore = useAuthStore()
+        const userId = authStore.user?.id
+        if (!userId) {
+          // throw new Error('User not authenticated')
+          //route to login           
+        }
         // Use runtime config for the API base URL
         const config = useRuntimeConfig()
         const apiBase = config.public.capi
@@ -23,16 +30,12 @@ export const useJokesStore = defineStore('jokes', {
         if (!res.ok) throw new Error('Failed to fetch jokes')
         const data = await res.json()
         
-        // Get current user ID from auth store
-        const authStore = useAuthStore()
-        const userId = authStore.user?.id
-        if (!userId) {
-          throw new Error('User not authenticated')
-          //route to login           
-        }
         
         // Process each joke to add likes, dislikes, and userLiked
-        this.jokes = data.map((joke: any) => processJokeWithStats(joke, userId))
+        this.jokes = data.map((joke: any) => processJokeWithStats(joke, userId ? userId : ""))
+        //sort jokes by createdAt in descending order
+        this.jokes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
         console.log('Fetched jokes:', this.jokes)
       } catch (err: any) {
         this.error = err.message || 'Unknown error'
