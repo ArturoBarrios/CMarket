@@ -14,7 +14,7 @@ export const useJokesStore = defineStore('jokes', {
   actions: {
     async fetchJokes() {
       this.loading = true
-      this.error = null
+      this.error = null 
       try {
         // Get current user ID from auth store
         const authStore = useAuthStore()
@@ -29,7 +29,6 @@ export const useJokesStore = defineStore('jokes', {
         const res = await fetch(`${apiBase}/primary/jokes`)
         if (!res.ok) throw new Error('Failed to fetch jokes')
         const data = await res.json()
-        
         
         // Process each joke to add likes, dislikes, and userLiked
         this.jokes = data.map((joke: any) => processJokeWithStats(joke, userId ? userId : ""))

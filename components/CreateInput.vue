@@ -2,7 +2,7 @@
   <div :class="[colors.border.primary, colors.bg.primary]" class="border border-gray-200 rounded-xl p-4  shadow mb-6">
     <textarea
       v-model="jokeText"
-      placeholder="Write a joke..."
+      placeholder="What are your thoughts? Do you have anything valuable to share that could enlighten those who are so unfortunate to not be as smart as you?"
       :class="[colors.text.primary]"
       class="w-full resize-none border-none outline-none text-lg placeholder-gray-500"
       rows="3"

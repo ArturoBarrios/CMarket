@@ -6,10 +6,10 @@
       <div 
       :class="colors.hover.primary"
       class="flex items-center space-x-3 p-3 rounded-xl transition">
-        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+        <!-- <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
           <span :class="colors.text.primary" class="font-bold text-lg">C</span>
-        </div>
-        <span :class="colors.text.primary" class="text-xl font-bold">CMarkett</span>
+        </div> -->
+        <span :class="colors.text.primary" class="text-xl font-bold">Story Town</span>
       </div>
       
       <!-- Profile -->

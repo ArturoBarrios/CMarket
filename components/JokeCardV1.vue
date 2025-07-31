@@ -9,7 +9,7 @@
     <div 
     :class="[colors.text.primary]"
     class="text-base mb-4 text-gray-800">{{ joke }}</div>
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center mb-4">
       <span class="opacity-0"></span>
       
       <div class="flex items-center gap-4">
@@ -33,12 +33,18 @@
         
       </div>
     </div>
+
+    <!-- Create Input at bottom of each joke card -->
+    <div class="border-t border-gray-100 pt-4">
+      <CreateInput />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useLikeJoke } from '~/composables/useLikeJoke'
+import CreateInput from '~/components/CreateInput.vue'
 
 const { colors } = useThemeStore()
 const authStore = useAuthStore()
@@ -54,7 +60,6 @@ const props = defineProps<{
   timeAgo?: string
 }>()
 
-
 const currentLikes = ref(props.likes)
 const retweetCount = ref(props.retweets)
 const { toggleLike } = useLikeJoke()
@@ -68,6 +73,7 @@ if(props.jokeId == "49c42d17-b365-4342-a087-aff46db5cb0e"){
     console.log("Initial likes:", props.likes)
     console.log("User liked status:", props.userLiked)
 }
+
 async function onLaughClick() {
   if (!authStore.isAuthenticated) {
     await navigateTo('/login')
@@ -127,8 +133,6 @@ async function onRetweetClick() {
     }
   }
 
-
-  
   console.log('Retweet clicked for joke:', props.jokeId)
 }
 </script>
