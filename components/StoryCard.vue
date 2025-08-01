@@ -7,15 +7,15 @@
       isSelected ? 'ring-2 ring-blue-500 border-blue-300' : 'border-gray-200',
       'cursor-pointer hover:shadow-md transition-all duration-200'
     ]"
-    class="border rounded-xl p-4 shadow-sm"
+    class="border rounded-xl p-4 shadow-sm flex flex-col h-full"
   >
     <!-- Story indicator -->
     <div class="flex items-center gap-2 mb-3">
-      <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+      <!-- <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
         <span class="text-white text-xs font-bold">📰</span>
-      </div>
-      <span class="text-sm font-medium text-blue-600">Story</span>
-      <span class="text-xs text-gray-500">• {{ timeAgo }}</span>
+      </div> -->
+      <!-- <span class="text-sm font-medium text-blue-600">Story</span> -->
+      <span class="text-xs text-gray-500">{{ timeAgo }}</span>
       <div v-if="isSelected" class="ml-auto">
         <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
       </div>
@@ -27,47 +27,13 @@
     </h3>
 
     <!-- Summary - shortened -->
-    <p :class="[colors.text.secondary]" class="text-sm leading-relaxed mb-3 line-clamp-2">
+    <p :class="[colors.text.secondary]" class="text-sm leading-relaxed mb-3 line-clamp-2 flex-grow">
       {{ summary }}
     </p>
 
-    <!-- Source only -->
-    <div class="flex items-center justify-between mb-3">
+    <!-- Source at bottom -->
+    <div class="mt-auto pt-2">
       <span class="text-xs text-gray-500">{{ source }}</span>
-    </div>
-
-    <!-- Interactive Options -->
-    <div v-if="isSelected" class="border-t border-gray-100 pt-3">
-      <!-- Selection indicator -->
-      <div class="flex items-center gap-2 text-blue-600 text-sm mb-3">
-        <span class="text-blue-500">✓</span>
-        <span class="font-medium">Selected Story</span>
-      </div>
-
-      <!-- Action buttons - 3 cols for more compact layout -->
-      <div class="grid grid-cols-3 gap-2">
-        <button
-          v-for="option in interactiveOptions"
-          :key="option.id"
-          @click.stop="selectOption(option)"
-          :class="[
-            selectedOption === option.id 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-            'cursor-pointer px-2 py-2 rounded-lg text-xs font-medium transition-colors'
-          ]"
-        >
-          {{ option.emoji }} {{ option.label }}
-        </button>
-      </div>
-
-      <!-- Selected option feedback -->
-      <div v-if="selectedOption" class="mt-3 p-2 bg-blue-50 rounded-lg">
-        <p class="text-xs text-blue-700">
-          <span class="font-medium">{{ getSelectedOptionLabel() }}:</span>
-          {{ getSelectedOptionDescription() }}
-        </p>
-      </div>
     </div>
   </div>
 </template>

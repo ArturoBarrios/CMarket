@@ -11,16 +11,7 @@
           @click="toggleExpanded"
           class="flex items-center gap-3 mb-4 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
         >
-          <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-            <span class="text-white text-lg">📰</span>
-          </div>
-          <div class="flex-1">
-            <h2 :class="[colors.text.primary]" class="text-xl font-bold">{{ selectedCategory.name }}</h2>
-            <p class="text-gray-500 text-sm">{{ selectedCategory.description }}</p>
-          </div>
-          <div class="text-gray-400">
-            <span class="text-2xl transition-transform duration-200" :class="{ 'rotate-180': isExpanded }">⌄</span>
-          </div>
+         
         </div>
 
         <!-- Category tabs (horizontal scrollable) with blur gradients -->
@@ -35,7 +26,7 @@
                   selectedCategory.id === category.id 
                     ? 'bg-blue-500 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors'
+                  'cursor-pointer px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors'
                 ]"
               >
                 {{ category.emoji }} {{ category.name }}
