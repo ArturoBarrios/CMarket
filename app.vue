@@ -8,13 +8,16 @@
 </template>
 <script setup lang="ts">
 import { useJokesStore } from '~/stores/jokes'
+import { useNewsStore } from '~/stores/news'
 import { onMounted } from 'vue'
 
 const jokesStore = useJokesStore()
+const newsStore = useNewsStore()
 
 onMounted(() => {
-  console.log('Fetching jokes on app mount...')
-  jokesStore.fetchJokes()
+  console.log('Fetching news on app mount...')
+  newsStore.getNewsToday();
+  // jokesStore.fetchJokes()
 })
 </script>
 

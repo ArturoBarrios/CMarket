@@ -1,30 +1,46 @@
+interface SubContent {
+  id: string
+  content: string
+  type: string
+  newsContentId: string
+}
+
+interface NewsContentResponse {
+  id: string
+  title: string
+  summary: string
+  createdAt: string
+  updatedAt: string
+  sourcesCount: number
+  updatePrompt: string | null
+  pointsPrompt: string | null
+  subContent: SubContent[]
+}
+
+interface ApiResponse {
+  success: boolean
+  message?: string
+  newsContents: {
+    success: boolean
+    message: string
+    newsContents: NewsContentResponse[]
+  }
+}
+
 interface NewsItem {
   id: string
   headline: string
   summary: string
   content?: string
-  sourcesCount?: string
+  source: string
   author?: string
-  publishedAt?: string
+  publishedAt: string
   timeAgo: string
-  category?: string
+  category: string
   tags: string[]
   imageUrl?: string
   url?: string
-}
-
-interface NewsContentResponse {
-  id: string | number
-  title: string
-  summary: string
-  content: string
-  createdAt: string
-}
-
-interface ApiResponse {
-  success: boolean
-  newsContents?: NewsContentResponse[]
-  message?: string
+  subContent: SubContent[]
 }
 
 // Helper function to calculate time ago
@@ -58,45 +74,85 @@ export const useNewsStore = defineStore('news', () => {
     loading.value = true
     error.value = null
     
+    console.log('🚀 Starting news fetch with body:', body)
+    
     try {
-       const response = await $fetch<ApiResponse>(`${API_BASE_URL}/news/get-news-content`, {
-      method: 'POST',
-      body: body,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+      const response = await $fetch<ApiResponse>(`${API_BASE_URL}/news/get-news-content`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    if (response.success && response.newsContents) {
-      news.value = response.newsContents.map((newsContent) => ({
-        id: newsContent.id,
-        headline: newsContent.title,
-        summary: newsContent.summary,
-        content: newsContent.content,
-        timeAgo: calculateTimeAgo(newsContent.createdAt),
-        source: '',
-        author: '',        
-        category: '',
-        tags: [],
-        imageUrl: '',
-        url: ''
-      }))
-    }
+      console.log('📡 Raw API Response:', response)
+      console.log('✅ Response success:', response.success)
+      console.log('📰 NewsContents success:', response.newsContents?.success)
+      console.log('📊 NewsContents array length:', response.newsContents?.newsContents?.length)
+
+      if (response.success && response.newsContents?.success && response.newsContents.newsContents) {
+        console.log('🔄 Processing news contents:', response.newsContents.newsContents)
+        
+        news.value = response.newsContents.newsContents.map((newsContent, index) => {
+          console.log(`📝 Processing news item ${index + 1}:`, newsContent)
+          
+          const processedItem = {
+            id: newsContent.id,
+            headline: newsContent.title,
+            summary: newsContent.summary,
+            content: '', // You can set this from summary or leave empty
+            timeAgo: calculateTimeAgo(newsContent.createdAt),
+            source: '',
+            author: '',
+            publishedAt: newsContent.createdAt,
+            category: '',
+            tags: [],
+            imageUrl: '',
+            url: '',
+            subContent: newsContent.subContent
+          }
+          
+          console.log(`✨ Processed item ${index + 1}:`, processedItem)
+          return processedItem
+        })
+        
+        console.log('🎉 Final news array:', news.value)
+      } else {
+        console.warn('⚠️ Response validation failed:', {
+          responseSuccess: response.success,
+          newsContentsSuccess: response.newsContents?.success,
+          hasNewsContents: !!response.newsContents?.newsContents
+        })
+      }
 
       return response
     } catch (err) {
+      console.error('💥 News fetch error details:', err)
+      console.error('🔍 Error type:', typeof err)
+      console.error('📋 Error properties:', Object.keys(err as any))
       error.value = 'Failed to fetch news'
-      console.error('News fetch error:', err)
       throw err
     } finally {
       loading.value = false
+      console.log('🏁 News fetch completed. Loading:', loading.value)
     }
+  }
+
+  // Helper function to get subcontent by type
+  const getSubContentByType = (newsItem: NewsItem, type: string): SubContent[] => {
+    return newsItem.subContent.filter(sub => sub.type === type)
+  }
+
+  // Helper function to get all unique subcontent types
+  const getSubContentTypes = (newsItem: NewsItem): string[] => {
+    return [...new Set(newsItem.subContent.map(sub => sub.type))]
   }
 
   return {
     news: readonly(news),
     loading: readonly(loading),
     error: readonly(error),
-    getNewsToday
+    getNewsToday,
+    getSubContentByType,
+    getSubContentTypes
   }
 })

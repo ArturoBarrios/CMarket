@@ -35,7 +35,7 @@ export const useJokesStore = defineStore('jokes', {
         //sort jokes by createdAt in descending order
         this.jokes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-        console.log('Fetched jokes:', this.jokes)
+        // console.log('Fetched jokes:', this.jokes)
       } catch (err: any) {
         this.error = err.message || 'Unknown error'
       } finally {
