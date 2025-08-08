@@ -16,7 +16,9 @@ const newsStore = useNewsStore()
 
 onMounted(() => {
   console.log('Fetching news on app mount...')
-  newsStore.getNewsToday();
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  newsStore.getNewsToday(yesterday.toISOString());
   // jokesStore.fetchJokes()
 })
 </script>

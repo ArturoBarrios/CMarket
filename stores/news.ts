@@ -43,6 +43,23 @@ interface NewsItem {
   subContent: SubContent[]
 }
 
+interface NewsWithoutContent {
+  id: string
+  title: string
+  url: string
+  summary?: string
+  createdAt: string
+  updatedAt: string
+  timeAgo: string
+}
+
+interface NewsWithoutContentResponse {
+  success: boolean
+  message: string
+  count: number
+  news: NewsWithoutContent[]
+}
+
 // Helper function to calculate time ago
 const calculateTimeAgo = (createdAt: string): string => {
   const now = new Date()
@@ -63,22 +80,26 @@ const calculateTimeAgo = (createdAt: string): string => {
 
 export const useNewsStore = defineStore('news', () => {
   const news = ref<NewsItem[]>([])
+  const newsWithoutContent = ref<NewsWithoutContent[]>([])
   const loading = ref(false)
+  const loadingWithoutContent = ref(false)
   const error = ref<string | null>(null)
+  const errorWithoutContent = ref<string | null>(null)
 
   // Get API base URL from runtime config
   const config = useRuntimeConfig()
   const API_BASE_URL = config.public.capi
 
-  const getNewsToday = async (body?: any) => {
+  const getNewsToday = async (startDate?: string) => {
     loading.value = true
     error.value = null
     
-    console.log('🚀 Starting news fetch with body:', body)
+    console.log('🚀 Starting news fetch with startDate:', startDate)
     
     try {
       const response = await $fetch<ApiResponse>(`${API_BASE_URL}/news/get-news-content`, {
-        method: 'GET',
+        method: 'POST',
+        body: startDate ? { startDate } : {},
         headers: {
           'Content-Type': 'application/json'
         }
@@ -137,6 +158,50 @@ export const useNewsStore = defineStore('news', () => {
     }
   }
 
+  const getNewsWithoutContent = async () => {
+    loadingWithoutContent.value = true
+    errorWithoutContent.value = null
+    
+    console.log('🚀 Starting news without content fetch')
+    
+    try {
+      const { getNewsWithoutContent: fetchNewsWithoutContent } = useNewsAPI()
+      const response = await fetchNewsWithoutContent()
+
+      console.log('📡 Raw API Response for news without content:', response)
+
+      if (response.success && response.news) {
+        console.log('🔄 Processing news without content:', response.news)
+        
+        newsWithoutContent.value = response.news.map((item, index) => {
+          console.log(`📝 Processing news without content item ${index + 1}:`, item)
+          
+          const processedItem = {
+            ...item,
+            timeAgo: calculateTimeAgo(item.createdAt)
+          }
+          
+          console.log(`✨ Processed item ${index + 1}:`, processedItem)
+          return processedItem
+        })
+        
+        console.log('🎉 Final news without content array:', newsWithoutContent.value)
+      } else {
+        console.warn('⚠️ Response validation failed:', response)
+        errorWithoutContent.value = response.message || 'Failed to fetch news without content'
+      }
+
+      return response
+    } catch (err) {
+      console.error('💥 News without content fetch error:', err)
+      errorWithoutContent.value = 'Failed to fetch news without content'
+      throw err
+    } finally {
+      loadingWithoutContent.value = false
+      console.log('🏁 News without content fetch completed')
+    }
+  }
+
   // Helper function to get subcontent by type
   const getSubContentByType = (newsItem: NewsItem, type: string): SubContent[] => {
     return newsItem.subContent.filter(sub => sub.type === type)
@@ -149,9 +214,13 @@ export const useNewsStore = defineStore('news', () => {
 
   return {
     news: readonly(news),
+    newsWithoutContent: readonly(newsWithoutContent),
     loading: readonly(loading),
+    loadingWithoutContent: readonly(loadingWithoutContent),
     error: readonly(error),
+    errorWithoutContent: readonly(errorWithoutContent),
     getNewsToday,
+    getNewsWithoutContent,
     getSubContentByType,
     getSubContentTypes
   }
