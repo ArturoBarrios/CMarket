@@ -352,6 +352,7 @@ import Nav from '~/components/Nav.vue'
 const { colors } = useThemeStore()
 const { sendStoryToAPI } = useStoryAPI()
 const { generateContent } = useContentGeneration()
+const { deleteNews } = useNewsAPI()
 
 const newsStore = useNewsStore()
 
@@ -405,9 +406,21 @@ const viewStory = (story: any) => {
 }
 
 const deleteStory = async (storyId: string) => {
-  if (confirm('Are you sure you want to delete this story?')) {
-    console.log('Deleting story:', storyId)
-    // Implement delete functionality if needed
+  if (confirm('Are you sure you want to delete this news story?')) {
+    try {
+      const result = await deleteNews(storyId)
+      
+      if (result.success) {
+        console.log('News story deleted successfully:', result.message)
+        // Refresh the news without content list
+        await loadNewsWithoutContent()
+      } else {
+        console.error('Failed to delete news story:', result.message)
+        // You could add a toast notification here
+      }
+    } catch (error) {
+      console.error('Delete news story error:', error)
+    }
   }
 }
 
@@ -480,8 +493,20 @@ const processStory = (story: any) => {
 
 const deleteNewsStory = async (storyId: string) => {
   if (confirm('Are you sure you want to delete this news story?')) {
-    console.log('Deleting news story:', storyId)
-    // Implement delete functionality if needed
+    try {
+      const result = await deleteNews(storyId)
+      
+      if (result.success) {
+        console.log('News story deleted successfully:', result.message)
+        // Refresh the news without content list
+        await loadNewsWithoutContent()
+      } else {
+        console.error('Failed to delete news story:', result.message)
+        // You could add a toast notification here
+      }
+    } catch (error) {
+      console.error('Delete news story error:', error)
+    }
   }
 }
 

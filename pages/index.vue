@@ -65,14 +65,14 @@
           </div>
           <div>
             <h2 :class="[colors.text.primary]" class="text-xl font-bold">Top Opinions</h2>
-            <p class="text-gray-500 text-sm">Community reactions and comedy</p>
+            <p class="text-gray-500 text-sm">Community reactions</p>
           </div>
         </div>
       </div>
       
       <!-- Jokes Feed -->
       <div v-if="loading" class="text-white text-center py-8">Loading jokes...</div>
-      <div v-else class="space-y-4">
+      <!-- <div v-else class="space-y-4">
         <JokeCardV1
           v-for="joke in jokes"
           :key="joke.id"
@@ -86,7 +86,7 @@
           :userRetweeted="joke.userRetweeted"
           :timeAgo="joke.timeAgo"
         />
-      </div>
+      </div> -->
     </div>
 
     <!-- Authentication Banner - Trumps everything when not authenticated -->
