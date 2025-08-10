@@ -9,7 +9,7 @@
         <!-- Expandable header -->
         <div 
           @click="toggleExpanded"
-          class="flex items-center gap-3 mb-4 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+          class="flex items-center gap-3 mb-4 cursor-pointer rounded-lg p-2 -m-2 transition-colors"
         >
           <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
             <span class="text-white text-lg">📰</span>

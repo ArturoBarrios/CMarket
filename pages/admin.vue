@@ -209,7 +209,7 @@
                       <span v-else>Generate content</span>
                     </button>
                     <button
-                      @click="deleteNewsStory(story.id)"
+                      @click="deleteStoryWithoutContent(story.id)"
                       class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-900 cursor-pointer"
                     >
                       Delete
@@ -224,9 +224,22 @@
 
       <!-- News Table -->
       <div :class="[colors.bg.primary]" class="rounded-lg shadow-sm border overflow-hidden">
-        <div class=" py-4 border-b border-gray-200">
-          <h2 :class="[colors.text.primary]" class="text-xl font-semibold">All Stories</h2>
-          <p class="text-sm text-gray-500 mt-1">{{ newsStore.news.length }} stories total</p>
+        <div class=" py-4 border-b border-gray-200 flex justify-between items-center">
+          <div>
+            <h2 :class="[colors.text.primary]" class="text-xl font-semibold">All Stories</h2>
+            <p class="text-sm text-gray-500 mt-1">{{ newsStore.news.length }} stories total</p>
+          </div>
+          <button
+            @click="refreshAllStories"
+            :disabled="newsStore.loading"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <span v-if="newsStore.loading" class="flex items-center">
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Loading...
+            </span>
+            <span v-else>Refresh</span>
+          </button>
         </div>
 
         <!-- Loading State -->
@@ -256,37 +269,70 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class=" py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Story
                 </th>
-                <th class=" py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Time
                 </th>
-                <th class=" py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Sub Content
                 </th>
-                <th class=" py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody :class="[colors.bg.primary]" class="divide-y divide-gray-200">
               <tr v-for="story in newsStore.news" :key="story.id" class="">
-                <td class=" py-4">
+                <td class="px-6 py-4">
                   <div class="max-w-sm">
                     <h3 :class="[colors.text.primary]" class="text-sm font-medium mb-1">{{ story.headline }}</h3>
                     <p :class="[colors.text.primary]" class="text-sm line-clamp-2">{{ story.summary }}</p>
                   </div>
                 </td>
-                <td class=" py-4 whitespace-nowrap">
+                <td class="px-6 py-4 whitespace-nowrap">
                   <span class="text-sm text-gray-500">{{ story.timeAgo }}</span>
                 </td>
-                <td class=" py-4 whitespace-nowrap">
-                  <span class="text-sm text-gray-500">
-                    {{ story.subContent.length }} items
-                  </span>
-                  <div v-if="story.subContent.length > 0" class="text-xs text-gray-400 mt-1">
-                    {{ getSubContentTypes(story).join(', ') }}
+                <td class="px-6 py-4">
+                  <div class="space-y-2">
+                    <div class="text-sm text-gray-500 mb-2">
+                      {{ story.subContent.length }} items
+                    </div>
+                    <div v-if="story.subContent.length > 0" class="space-y-2 max-h-40 overflow-y-auto">
+                      <div 
+                        v-for="subItem in story.subContent" 
+                        :key="subItem.id"
+                        class="bg-gray-800 border border-gray-700 rounded p-2 text-xs"
+                      >
+                        <div class="flex justify-between items-start gap-2">
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 text-white">
+                                {{ subItem.type }}
+                              </span>                              
+                            </div>
+                            <p class="text-white text-xs line-clamp-2 break-words">
+                              {{ subItem.content }}
+                            </p>
+                          </div>
+                          <button
+                            @click="deleteSubContent(story.id, subItem.id)"
+                            :disabled="deletingSubContent[subItem.id]"
+                            class="flex-shrink-0 text-red-400 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Delete subcontent"
+                          >
+                            <span v-if="deletingSubContent[subItem.id]" class="inline-block">
+                              <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-red-400 mr-1"></div>
+                            </span>
+                            <span v-else class="text-xs">×</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-xs text-gray-400 italic">
+                      No subcontent available
+                    </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -306,12 +352,12 @@
                         View
                       </button>
                       <button
-                        @click="deleteStory(story.id)"
+                        @click="deleteStoryAndContent(story.id)"
                         class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-900 cursor-pointer"
                       >
                         Delete
                       </button>
-                    </div>
+                    </div
                     
                     <!-- Generate Context section -->
                     <div class="flex items-center gap-2">
@@ -352,7 +398,7 @@ import Nav from '~/components/Nav.vue'
 const { colors } = useThemeStore()
 const { sendStoryToAPI } = useStoryAPI()
 const { generateContent } = useContentGeneration()
-const { deleteNews } = useNewsAPI()
+const { deleteNewsWithoutContent, deleteNewsContent } = useNewsAPI()
 
 const newsStore = useNewsStore()
 
@@ -405,10 +451,29 @@ const viewStory = (story: any) => {
   // You can implement a modal or navigation to detailed view
 }
 
-const deleteStory = async (storyId: string) => {
+const deleteStoryWithoutContent = async (storyId: string) => {
   if (confirm('Are you sure you want to delete this news story?')) {
     try {
-      const result = await deleteNews(storyId)
+      const result = await deleteNewsWithoutContent(storyId)
+      
+      if (result.success) {
+        console.log('News story deleted successfully:', result.message)
+        // Refresh the news without content list
+        await loadNewsWithoutContent()
+      } else {
+        console.error('Failed to delete news story:', result.message)
+        // You could add a toast notification here
+      }
+    } catch (error) {
+      console.error('Delete news story error:', error)
+    }
+  }
+}
+
+const deleteStoryAndContent = async (storyId: string) => {
+  if (confirm('Are you sure you want to delete this news and content?')) {
+    try {
+      const result = await deleteNewsContent(storyId)
       
       if (result.success) {
         console.log('News story deleted successfully:', result.message)
@@ -491,24 +556,40 @@ const processStory = (story: any) => {
   // You can implement processing logic here
 }
 
-const deleteNewsStory = async (storyId: string) => {
-  if (confirm('Are you sure you want to delete this news story?')) {
-    try {
-      const result = await deleteNews(storyId)
-      
-      if (result.success) {
-        console.log('News story deleted successfully:', result.message)
-        // Refresh the news without content list
-        await loadNewsWithoutContent()
-      } else {
-        console.error('Failed to delete news story:', result.message)
-        // You could add a toast notification here
+// Delete subcontent functionality
+const deletingSubContent = ref<Record<string, boolean>>({})
+
+const deleteSubContent = async (storyId: string, subContentId: string) => {
+  if (!confirm('Are you sure you want to delete this subcontent item?')) {
+    return
+  }
+  
+  deletingSubContent.value[subContentId] = true
+  
+  try {
+    const response = await $fetch(`${API_BASE_URL}/news/${storyId}/subcontent/${subContentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error('Delete news story error:', error)
-    }
+    })
+    
+    console.log('Subcontent deleted successfully')
+    
+    // Refresh the news list to reflect the changes
+    const tenDaysAgo = new Date()
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 10)
+    await newsStore.getNewsToday(tenDaysAgo.toISOString())
+    
+  } catch (error) {
+    console.error('Delete subcontent error:', error)
+    // You could add a toast notification here
+  } finally {
+    deletingSubContent.value[subContentId] = false
   }
 }
+
+
 
 // Generate Context functionality
 const contextInputs = ref<Record<string, string>>({})
@@ -578,13 +659,14 @@ const generateMoreContent = (story: any) => {
   console.log('Generating more content for story:', story)
   // Implement more content generation logic here
 }
+
+const refreshAllStories = async () => {
+  const tenDaysAgo = new Date()
+  tenDaysAgo.setDate(tenDaysAgo.getDate() - 10)
+  await newsStore.getNewsToday(tenDaysAgo.toISOString())
+}
+
+
 </script>
 
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>
+

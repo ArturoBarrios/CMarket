@@ -34,11 +34,34 @@ export const useNewsAPI = () => {
     }
   }
 
-  const deleteNews = async (newsId: string) => {
+  const deleteNewsWithoutContent = async (newsId: string) => {
     try {
-      const response = await $fetch(`${API_BASE_URL}/news/delete-news`, {
+      const response = await $fetch(`${API_BASE_URL}/news/delete-newswithoutcontent`, {
         method: 'POST',
         body: { newsId },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      return {
+        success: response.success,
+        message: response.message
+      }
+    } catch (error) {
+      console.error('Delete news error:', error)
+      return {
+        success: false,
+        message: 'Failed to delete news. Please try again.'
+      }
+    }
+  }
+  
+  const deleteNewsContent = async (newsContentId: string) => {
+    try {
+      const response = await $fetch(`${API_BASE_URL}/news/delete-newscontent`, {
+        method: 'POST',
+        body: { newsContentId },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -59,6 +82,7 @@ export const useNewsAPI = () => {
 
   return {
     getNewsWithoutContent,
-    deleteNews
+    deleteNewsWithoutContent,
+    deleteNewsContent
   }
 }
