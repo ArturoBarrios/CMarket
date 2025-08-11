@@ -114,6 +114,111 @@
         </div>
       </div>
 
+      <!-- Create Post in All Stories Section -->
+      <div :class="[colors.bg.primary]" class="rounded-lg shadow-sm border mb-8">
+        <h2 :class="[colors.text.primary]" class="text-xl font-semibold mb-4">Create Social Media Post</h2>
+        <form @submit.prevent="createSocialMediaPost" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="postContent" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Content</label>
+              <textarea
+                id="postContent"
+                v-model="socialMediaForm.content"
+                rows="4"
+                required
+                class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                placeholder="Enter post content..."
+              ></textarea>
+            </div>
+            
+            <div class="space-y-4">
+              <div>
+                <label for="username" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Username</label>
+                <input
+                  id="username"
+                  v-model="socialMediaForm.username"
+                  type="text"
+                  required
+                  class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                  placeholder="Enter username..."
+                />
+              </div>
+              
+              <div>
+                <label for="platform" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Platform</label>
+                <select
+                  id="platform"
+                  v-model="socialMediaForm.platform"
+                  required
+                  class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                >
+                  <option value="">Select platform...</option>
+                  <option value="twitter">Twitter</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="linkedin">LinkedIn</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="postLink" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Link</label>
+                <input
+                  id="postLink"
+                  v-model="socialMediaForm.link"
+                  type="url"
+                  required
+                  class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                  placeholder="Enter post link..."
+                />
+              </div>
+              
+              <div>
+                <label for="newsContentId" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">News Content ID</label>
+                <select
+                  id="newsContentId"
+                  v-model="socialMediaForm.newsContentId"
+                  required
+                  class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                >
+                  <option value="">Select news story...</option>
+                  <option v-for="story in newsStore.news" :key="story.id" :value="story.id">
+                    {{ story.headline }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <button
+              type="submit"
+              :disabled="creatingPost"
+              class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span v-if="creatingPost" class="flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Creating Post...
+              </span>
+              <span v-else>Create Social Media Post</span>
+            </button>
+            
+            <button
+              type="button"
+              @click="resetSocialMediaForm"
+              class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+        
+        <div v-if="socialMediaMessage" class="mt-4">
+          <p :class="socialMediaError ? 'text-red-600' : 'text-green-600'" class="text-sm">
+            {{ socialMediaMessage }}
+          </p>
+        </div>
+      </div>
+
       <!-- News Without Content Section -->
       <div :class="[colors.bg.primary]" class="rounded-lg shadow-sm border overflow-hidden mb-8">
         <div class="py-4 border-b border-gray-200 flex justify-between items-center">
@@ -399,6 +504,7 @@ const { colors } = useThemeStore()
 const { sendStoryToAPI } = useStoryAPI()
 const { generateContent } = useContentGeneration()
 const { deleteNewsWithoutContent, deleteNewsContent } = useNewsAPI()
+const { createSocialMediaPost: createPost } = useSocialMediaAPI()
 
 const newsStore = useNewsStore()
 
@@ -639,6 +745,61 @@ const handleGenerateContent = async (story: any) => {
   } finally {
     generatingContentForStory.value[story.id] = false
   }
+}
+
+// Social Media Post functionality
+const socialMediaForm = ref({
+  content: '',
+  username: '',
+  platform: '',
+  link: '',
+  newsContentId: ''
+})
+const creatingPost = ref(false)
+const socialMediaMessage = ref('')
+const socialMediaError = ref(false)
+
+const createSocialMediaPost = async () => {
+  creatingPost.value = true
+  socialMediaMessage.value = ''
+  socialMediaError.value = false
+
+  try {
+    const result = await createPost({
+      content: socialMediaForm.value.content,
+      username: socialMediaForm.value.username,
+      platform: socialMediaForm.value.platform,
+      link: socialMediaForm.value.link,
+      newsContentId: socialMediaForm.value.newsContentId
+    })
+
+    if (result.success) {
+      socialMediaMessage.value = result.data?.message || 'Social media post created successfully!'
+      socialMediaError.value = false
+      resetSocialMediaForm()
+    } else {
+      socialMediaMessage.value = result.error || 'Failed to create social media post. Please try again.'
+      socialMediaError.value = true
+    }
+  } catch (error) {
+    console.error('Create social media post error:', error)
+    socialMediaMessage.value = 'Failed to create social media post. Please try again.'
+    socialMediaError.value = true
+  } finally {
+    creatingPost.value = false
+  }
+}
+
+const resetSocialMediaForm = () => {
+  socialMediaForm.value = {
+    content: '',
+    username: '',
+    platform: '',
+    link: '',
+    newsContentId: ''
+  }
+  socialMediaMessage.value = ''
+  socialMediaError.value = false
 }
 
 onMounted(() => {
