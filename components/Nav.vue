@@ -9,7 +9,7 @@
         <!-- <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
           <span :class="colors.text.primary" class="font-bold text-lg">C</span>
         </div> -->
-        <span :class="colors.text.primary" class="text-xl font-bold">Story Town</span>
+        <span :class="colors.text.primary" class="text-xl font-bold">Story Pulse</span>
       </div>
       
       <!-- Profile -->
@@ -22,18 +22,6 @@
           </svg>
         </div>
         <span :class="colors.text.primary" class="text-xl">Profile</span>
-      </a>
-      
-      <!-- Explore -->
-      <a href="#" 
-      :class="colors.hover.primary"
-      class="flex items-center space-x-3 p-3 rounded-xl transition">
-        <div :class="colors.text.primary" class="w-6 h-6">
-          <svg fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <span class="text-xl text-white">Explore</span>
       </a>
 
       <!-- Signout (when authenticated) -->
@@ -68,47 +56,6 @@
         <span 
         :class="colors.text.primary"
         class="text-xs">Home</span>
-      </a>
-      
-      <a href="#" 
-      class="flex flex-col items-center space-y-1 p-2">
-        <div 
-        :class="colors.text.primary"
-        class="w-6 h-6">
-          <svg fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <span 
-        :class="colors.text.primary"
-        class="text-xs">Explore</span>
-      </a>
-
-      <a href="#" 
-      class="flex flex-col items-center space-y-1 p-2">
-        <div 
-        :class="colors.text.primary"
-        class="w-6 h-6">
-          <svg fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <span 
-        :class="colors.text.primary"
-        class="text-xs">Competitions</span>
-      </a>
-      
-      <a href="#" class="flex flex-col items-center space-y-1 p-2">
-        <div 
-        :class="colors.text.primary"
-        class="w-6 h-6">
-          <svg fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <span 
-        :class="colors.text.primary"
-        class="text-xs">Profile</span>
       </a>
 
       <!-- Signout (when authenticated) -->

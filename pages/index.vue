@@ -41,52 +41,108 @@
 
         <!-- Stories grid -->
         <div v-else-if="isExpanded" class="space-y-4">
+          <!-- First story (always visible) -->
           <StoryCard
-            v-for="story in newsStore.news"
-            :key="story.id"
-            :id="story.id"
-            :headline="story.headline"
-            :summary="story.summary"
-            :time-ago="story.timeAgo"
-            :tags="story.tags"
-            :source="story.source || 'Unknown Source'"
-            :sub-content="story.subContent"
-            :is-selected="selectedStoryId === story.id"
+            v-if="newsStore.news[0]"
+            :key="newsStore.news[0].id"
+            :id="newsStore.news[0].id"
+            :headline="newsStore.news[0].headline"
+            :summary="newsStore.news[0].summary"
+            :time-ago="newsStore.news[0].timeAgo"
+            :tags="newsStore.news[0].tags"
+            :source="newsStore.news[0].source || 'Unknown Source'"
+            :sub-content="newsStore.news[0].subContent"
+            :is-selected="selectedStoryId === newsStore.news[0].id"
             @select="selectStory"
+          />
+
+          <!-- Show More Stories Button (only if there are more stories and not expanded) -->
+          <div v-if="newsStore.news.length > 1 && !isStoriesExpanded" class="relative my-6">
+            
+            <div class="relative flex justify-end">
+              <button
+                @click="toggleStoriesExpanded"
+                class=" px-6 py-3 text-sm font-medium text-white rounded-full bg-gray-800 transition-colors duration-200 flex items-center gap-2 cursor-pointer"
+              >
+                <span>Show More Stories</span>
+                <svg 
+                  class="w-4 h-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Additional stories (toggleable) -->
+          <div v-if="isStoriesExpanded && newsStore.news.length > 1" class="space-y-4">
+            <StoryCard
+              v-for="story in newsStore.news.slice(1)"
+              :key="story.id"
+              :id="story.id"
+              :headline="story.headline"
+              :summary="story.summary"
+              :time-ago="story.timeAgo"
+              :tags="story.tags"
+              :source="story.source || 'Unknown Source'"
+              :sub-content="story.subContent"
+              :is-selected="selectedStoryId === story.id"
+              @select="selectStory"
+            />
+          </div>
+
+          <!-- Show Less Stories Button (when expanded, appears below stories) -->
+          <div v-if="newsStore.news.length > 1 && isStoriesExpanded" class="relative my-6">
+            
+            <div class="relative flex justify-end">
+              <button
+                @click="toggleStoriesExpanded"
+                class="px-6 py-3 text-sm font-medium text-white rounded-full bg-gray-800 transition-colors duration-200 flex items-center gap-2 cursor-pointer"
+              >
+                <span>Show Less Stories</span>
+                <svg 
+                  class="w-4 h-4 rotate-180" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts Section - Show when story is selected and has posts -->
+      <div v-if="selectedStory && selectedStory.posts && selectedStory.posts.length > 0" class="mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+            <span class="text-white text-lg">💬</span>
+          </div>
+          <div>
+            <h2 :class="[colors.text.primary]" class="text-xl font-bold">Community Posts</h2>
+            <p class="text-gray-500 text-sm">{{ selectedStory.posts.length }} {{ selectedStory.posts.length === 1 ? 'post' : 'posts' }} about this story</p>
+          </div>
+        </div>
+
+        <!-- Posts List -->
+        <div class="space-y-4">
+          <PostCard
+            v-for="post in selectedStory.posts"
+            :key="post.id"
+            :content="post.content"
+            :username="post.socialMediaAccount.username"
+            :platform="post.socialMediaAccount.platform"
           />
         </div>
       </div>
 
-      <!-- Top Opinions Section Header -->
-      <div class="mb-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-            <span class="text-white text-lg">💭</span>
-          </div>
-          <div>
-            <h2 :class="[colors.text.primary]" class="text-xl font-bold">Top Opinions</h2>
-            <p class="text-gray-500 text-sm">Community reactions</p>
-          </div>
-        </div>
-      </div>
       
-      <!-- Jokes Feed -->
-      <div v-if="loading" class="text-white text-center py-8">Loading jokes...</div>
-      <!-- <div v-else class="space-y-4">
-        <JokeCardV1
-          v-for="joke in jokes"
-          :key="joke.id"
-          :joke="joke.content"
-          :username="joke.user ? joke.user.username : joke.username"
-          :likes="joke.likes || 0"
-          :dislikes="joke.dislikes || 0"
-          :retweets="joke.retweets || 0"
-          :jokeId="joke.id"
-          :userLiked="joke.userLiked"
-          :userRetweeted="joke.userRetweeted"
-          :timeAgo="joke.timeAgo"
-        />
-      </div> -->
+     
     </div>
 
     <!-- Authentication Banner - Trumps everything when not authenticated -->
@@ -112,20 +168,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useJokesStore } from '~/stores/jokes'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useNewsStore } from '~/stores/news'
 import { useAuthStore } from '~/stores/auth'
 import JokeCardV1 from '~/components/JokeCardV1.vue'
 import StoryCard from '~/components/StoryCard.vue'
 import Nav from '~/components/Nav.vue'
-import { onMounted } from 'vue'
+import PostCard from '~/components/PostCard.vue'
 import { storeToRefs } from 'pinia'
 
 const { colors } = useThemeStore()
 
-const jokesStore = useJokesStore()
-const { jokes, loading } = storeToRefs(jokesStore)
 
 const newsStore = useNewsStore()
 
@@ -134,10 +187,15 @@ const { isAuthenticated } = storeToRefs(authStore)
 
 const selectedStoryId = ref<string>('')
 const isExpanded = ref(true)
+const isStoriesExpanded = ref(false)
 
 // Methods
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value
+}
+
+const toggleStoriesExpanded = () => {
+  isStoriesExpanded.value = !isStoriesExpanded.value
 }
 
 const selectStory = (storyId: string) => {
@@ -147,23 +205,25 @@ const selectStory = (storyId: string) => {
 }
 
 onMounted(() => {
-  if (!jokesStore.jokes.length) {
-    jokesStore.fetchJokes()
-  }
+
   // Set first story as selected when news loads
   if (newsStore.news.length > 0) {
     selectedStoryId.value = newsStore.news[0].id
   }
-  console.log("Jokes fetched:", jokesStore.jokes)
+  console.log("newsStore on mounted:", newsStore.news)
+})
+
+// Watch for when news data becomes available and auto-select first story
+watch(() => newsStore.news, (newNews) => {
+  if (newNews.length > 0 && !selectedStoryId.value) {
+    selectedStoryId.value = newNews[0].id
+    console.log('Auto-selected first story:', newNews[0])
+  }
+}, { immediate: true })
+
+// Computed property to get the selected story
+const selectedStory = computed(() => {
+  return newsStore.news.find(story => story.id === selectedStoryId.value)
 })
 </script>
 
-<style scoped>
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-</style>

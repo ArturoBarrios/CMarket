@@ -7,7 +7,9 @@
       isSelected ? 'ring-2 ring-blue-500 border-blue-300' : 'border-gray-200',
       'cursor-pointer hover:shadow-md transition-all duration-200'
     ]"
-    class="border rounded-xl p-4 shadow-sm flex flex-col h-full"
+    class="border rounded-xl p-4 shadow-sm flex flex-col h-full
+    w-full"
+
   >
     <!-- Story indicator -->
     <div class="flex items-center gap-2 mb-3">
@@ -31,10 +33,7 @@
       {{ summary }}
     </p>
 
-    <!-- Source at bottom -->
-    <div class="mt-auto pt-2">
-      <span class="text-xs text-gray-500">21 sources</span>
-    </div>
+    
 
     <!-- Expandable Subcontent Section -->
     <div v-if="Object.keys(groupedSubContent).length > 0" class="mt-4 pt-4 border-t border-gray-200">
