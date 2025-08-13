@@ -13,11 +13,7 @@
   >
     <!-- Story indicator -->
     <div class="flex items-center gap-2 mb-3">
-      <!-- <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-        <span class="text-white text-xs font-bold">📰</span>
-      </div> -->
-      <!-- <span class="text-sm font-medium text-blue-600">Story</span> -->
-      <span class="text-xs text-gray-500">{{ timeAgo }}</span>
+      <span class="text-xs text-gray-500">{{ formatDate(timeAgo) }}</span>
       <div v-if="isSelected" class="ml-auto">
         <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
       </div>
@@ -230,5 +226,15 @@ const getTypeBorderClass = (type: string): string => {
 
 const toggleSubContentExpanded = () => {
   isSubContentExpanded.value = !isSubContentExpanded.value
+}
+
+const formatDate = (timeAgo: string) => {
+  // If timeAgo is already a date string, parse it, otherwise use current date
+  const date = new Date(timeAgo) || new Date()
+  return date.toLocaleDateString('en-US', { 
+    month: '2-digit', 
+    day: '2-digit', 
+    year: 'numeric' 
+  })
 }
 </script>

@@ -28,13 +28,31 @@
         <p class="text-gray-500">No news available</p>
       </div>
       
+      <!-- Topics Navigation -->
+      <div v-else class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="topic in Object.keys(storiesByTopic)"
+            :key="topic"
+            @click="scrollToTopic(topic)"
+            class="cursor-pointer px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-full text-sm font-medium transition-colors duration-200 border border-gray-600 hover:border-gray-500 capitalize"
+          >
+            {{ topic }}
+            <span class="ml-1 text-xs text-gray-400">({{ storiesByTopic[topic].length }})</span>
+          </button>
+        </div>
+      </div>
 
       <!-- Newspaper Sections -->
-      <div v-else class="space-y-12">
+      <div class="space-y-12">
         <!-- Dynamic Topic Sections -->
         <section 
           v-for="(stories, topic) in storiesByTopic" 
           :key="topic"
+          :id="`topic-${topic.toLowerCase().replace(/\s+/g, '-')}`"
           class="border-b border-gray-300 pb-8"
         >
           <div class="flex items-center gap-3 mb-6">
@@ -50,7 +68,7 @@
             <article 
               v-for="story in stories" 
               :key="story.id"
-              class="border-l-4 border-red-600 pl-4 cursor-pointer hover:bg-gray-600 transition-colors p-3 -m-3 rounded"
+              class="border-l-4 border-red-600 pl-4 cursor-pointer hover:bg-gray-600 transition-colors p-3 -m-3 rounded relative"
               @click="selectStory(story.id)"
             >
               <h3 :class="[colors.text.primary]" class="font-bold text-lg mb-2 font-serif leading-tight">
@@ -59,8 +77,10 @@
               <p class="text-gray-100 text-sm mb-3 ">
                 {{ story.summary }}
               </p>
+              
               <div class="flex items-center justify-between text-xs text-gray-500">
-                <span>{{ story.timeAgo }}</span>
+                <span>{{ formatDate(story.timeAgo) }}</span>
+                <span class="text-blue-400 font-medium">Click story for more</span>
               </div>
               <div v-if="story.tags && story.tags.length > 0" class="flex flex-wrap gap-1 mt-2">
                 <span 
@@ -120,6 +140,29 @@
         </div>
       </div>
     </div>
+
+    <!-- Story Modal -->
+    <Transition name="modal">
+      <div v-if="showModal && selectedStory" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" @click="closeModal">
+        <div class="bg-black border border-gray-600 rounded-lg max-w-4xl max-h-[90vh] overflow-y-auto p-6 relative modal-content" @click.stop>
+          <!-- Close Button -->
+          <button @click="closeModal" class="cursor-pointer absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">
+            ×
+          </button>
+          
+          <!-- Modal Content -->
+          <div class="text-white">
+            <h1 class="text-3xl font-bold font-serif mb-2 pr-8">{{ selectedStory.headline }}</h1>
+            <p class="text-gray-400 text-sm mb-4">{{ formatDate(selectedStory.timeAgo) }}</p>
+            <p class="text-gray-300 text-lg mb-6 leading-relaxed">{{ selectedStory.summary }}</p>
+            
+            <div v-if="selectedStory.news && selectedStory.news[0] && selectedStory.news[0].content" class="prose prose-invert max-w-none">
+              <div class="text-gray-100 leading-relaxed whitespace-pre-wrap">{{ selectedStory.news[0].content }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -142,6 +185,7 @@ const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)
 
 const selectedStoryId = ref<string>('')
+const showModal = ref(false)
 const isExpanded = ref(true)
 const isStoriesExpanded = ref(false)
 
@@ -156,8 +200,31 @@ const toggleStoriesExpanded = () => {
 
 const selectStory = (storyId: string) => {
   selectedStoryId.value = storyId
+  showModal.value = true
   const story = newsStore.news.find(s => s.id === storyId)
   console.log('Selected story:', story)
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+const scrollToTopic = (topic: string) => {
+  const elementId = `topic-${topic.toLowerCase().replace(/\s+/g, '-')}`
+  const element = document.getElementById(elementId)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+const formatDate = (timeAgo: string) => {
+  // If timeAgo is already a date string, parse it, otherwise use current date
+  const date = new Date(timeAgo) || new Date()
+  return date.toLocaleDateString('en-US', { 
+    month: '2-digit', 
+    day: '2-digit', 
+    year: 'numeric' 
+  })
 }
 
 onMounted(() => {
@@ -197,5 +264,35 @@ const storiesByTopic = computed(() => {
   return grouped
 })
 </script>
+
+<style scoped>
+.modal-enter-active {
+  transition: all 0.3s ease;
+}
+
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-from {
+  opacity: 0;
+}
+
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .modal-content {
+  transform: scale(0.8) translateY(-50px);
+}
+
+.modal-leave-to .modal-content {
+  transform: scale(0.8) translateY(-50px);
+}
+
+.modal-content {
+  transition: transform 0.3s ease;
+}
+</style>
 
 

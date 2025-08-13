@@ -14,7 +14,7 @@ interface Post {
 
 interface NewsContentResponse {
   id: string
-  title: string
+  title: string  
   summary: string
   createdAt: string
   updatedAt: string
@@ -45,7 +45,7 @@ interface NewsItem {
   id: string
   headline: string
   summary: string
-  content?: string
+  content: string
   source: string
   author?: string
   publishedAt: string
@@ -77,20 +77,12 @@ interface NewsWithoutContentResponse {
 
 // Helper function to calculate time ago
 const calculateTimeAgo = (createdAt: string): string => {
-  const now = new Date()
-  const created = new Date(createdAt)
-  const diffInMs = now.getTime() - created.getTime()
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes}m ago`
-  } else if (diffInHours < 24) {
-    return `${diffInHours}h ago`
-  } else {
-    return `${diffInDays}d ago`
-  }
+  const date = new Date(createdAt)
+  return date.toLocaleDateString('en-US', { 
+    month: '2-digit', 
+    day: '2-digit', 
+    year: 'numeric' 
+  })
 }
 
 export const useNewsStore = defineStore('news', () => {
@@ -134,8 +126,7 @@ export const useNewsStore = defineStore('news', () => {
           const processedItem = {
             id: newsContent.id,
             headline: newsContent.title,
-            summary: newsContent.summary,
-            content: '', // You can set this from summary or leave empty
+            summary: newsContent.summary,            
             timeAgo: calculateTimeAgo(newsContent.createdAt),
             source: '',
             author: '',
