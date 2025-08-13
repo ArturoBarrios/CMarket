@@ -104,8 +104,8 @@
     <!-- Authentication Banner - Trumps everything when not authenticated -->
     <div v-if="!isAuthenticated" class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-2xl border-t-2 border-white/20 z-[9999]">
       <div class="max-w-md mx-auto text-center">
-        <h3 class="text-lg font-bold mb-2">Join Story Town Today!</h3>
-        <p class="text-sm mb-4 opacity-90">Sign up to create jokes, vote, and compete with others!</p>
+        <h3 class="text-lg font-bold mb-2">Join Today!</h3>
+        <p class="text-sm mb-4 opacity-90">Sign up to create your own custom news feed!!!!</p>
         <div class="flex space-x-3">
           <NuxtLink 
             to="/signup" 
