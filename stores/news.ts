@@ -23,6 +23,7 @@ interface NewsContentResponse {
   pointsPrompt: string | null
   subContent: SubContent[]
   posts: Post[]
+  news: News[]
 }
 
 interface ApiResponse {
@@ -33,6 +34,11 @@ interface ApiResponse {
     message: string
     newsContents: NewsContentResponse[]
   }
+}
+
+interface News {
+  id: string
+  topic: string
 }
 
 interface NewsItem {
@@ -139,7 +145,8 @@ export const useNewsStore = defineStore('news', () => {
             imageUrl: '',
             url: '',
             subContent: newsContent.subContent,
-            posts: newsContent.posts
+            posts: newsContent.posts,
+            news: newsContent.news  
           }
           
           console.log(`✨ Processed item ${index + 1}:`, processedItem)

@@ -10,6 +10,80 @@
         <p class="text-gray-500">Manage and scrape news content</p>
       </div>
 
+      <!-- Generate News Section -->
+      <div :class="[colors.bg.primary]" class="rounded-lg shadow-sm border mb-8">
+        <h2 :class="[colors.text.primary]" class="text-xl font-semibold mb-4">Generate News with AI</h2>
+        <form @submit.prevent="generateAINews" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label for="topic" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Topic</label>
+              <input
+                id="topic"
+                v-model="aiNewsForm.topic"
+                type="text"
+                required
+                class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                placeholder="Enter news topic..."
+              />
+            </div>
+            
+            <div>
+              <label for="numberOfArticles" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Number of Articles</label>
+              <input
+                id="numberOfArticles"
+                v-model.number="aiNewsForm.numberOfArticles"
+                type="number"
+                min="1"
+                max="10"
+                required
+                class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                placeholder="Enter number..."
+              />
+            </div>
+            
+            <div>
+              <label for="location" :class="[colors.text.primary]" class="block text-sm font-medium mb-2">Location</label>
+              <input
+                id="location"
+                v-model="aiNewsForm.location"
+                type="text"
+                required
+                class="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white bg-gray-800"
+                placeholder="Enter location..."
+              />
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <button
+              type="submit"
+              :disabled="generatingAI"
+              class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span v-if="generatingAI" class="flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Generating...
+              </span>
+              <span v-else>Generate AI News</span>
+            </button>
+            
+            <button
+              type="button"
+              @click="resetAIForm"
+              class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+        
+        <div v-if="aiMessage" class="mt-4">
+          <p :class="aiError ? 'text-red-600' : 'text-green-600'" class="text-sm">
+            {{ aiMessage }}
+          </p>
+        </div>
+      </div>
+
       <!-- Create News Section -->
       <div :class="[colors.bg.primary]" class="rounded-lg shadow-sm border  mb-8">
         <h2 :class="[colors.text.primary]" class="text-xl font-semibold mb-4">Create News</h2>
@@ -61,6 +135,17 @@
                 Creating...
               </span>
               <span v-else>Create News Article</span>
+            </button>
+            <button
+              type="submit"
+              :disabled="creating"
+              class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span v-if="creating" class="flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Creating...
+              </span>
+              <span v-else>Create and Generate News Article</span>
             </button>
             
             <button
@@ -505,6 +590,7 @@ const { sendStoryToAPI } = useStoryAPI()
 const { generateContent } = useContentGeneration()
 const { deleteNewsWithoutContent, deleteNewsContent } = useNewsAPI()
 const { createSocialMediaPost: createPost } = useSocialMediaAPI()
+const { generateNewsWithAI } = useGenerateNewsWithAI()
 
 const newsStore = useNewsStore()
 
@@ -745,6 +831,60 @@ const handleGenerateContent = async (story: any) => {
   } finally {
     generatingContentForStory.value[story.id] = false
   }
+}
+
+// AI News Generation functionality
+const aiNewsForm = ref({
+  topic: '',
+  numberOfArticles: 3,
+  location: ''
+})
+const generatingAI = ref(false)
+const aiMessage = ref('')
+const aiError = ref(false)
+
+const generateAINews = async () => {
+  generatingAI.value = true
+  aiMessage.value = ''
+  aiError.value = false
+
+  try {
+    const result = await generateNewsWithAI({
+      topic: aiNewsForm.value.topic,
+      numberOfArticles: aiNewsForm.value.numberOfArticles,
+      location: aiNewsForm.value.location
+    })
+
+    if (result.success) {
+      aiMessage.value = result.message || 'AI news generated successfully!'
+      aiError.value = false
+      resetAIForm()
+      
+      // Refresh news after generating
+      const tenDaysAgo = new Date()
+      tenDaysAgo.setDate(tenDaysAgo.getDate() - 10)
+      await newsStore.getNewsToday(tenDaysAgo.toISOString())
+    } else {
+      aiMessage.value = result.error || 'Failed to generate AI news. Please try again.'
+      aiError.value = true
+    }
+  } catch (error) {
+    console.error('Generate AI news error:', error)
+    aiMessage.value = 'Failed to generate AI news. Please try again.'
+    aiError.value = true
+  } finally {
+    generatingAI.value = false
+  }
+}
+
+const resetAIForm = () => {
+  aiNewsForm.value = {
+    topic: '',
+    numberOfArticles: 3,
+    location: ''
+  }
+  aiMessage.value = ''
+  aiError.value = false
 }
 
 // Social Media Post functionality
